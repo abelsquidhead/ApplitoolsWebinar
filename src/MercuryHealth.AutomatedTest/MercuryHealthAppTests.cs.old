@@ -1,0 +1,316 @@
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MercuryHealth.AutomatedTest.Pages;
+
+namespace MercuryHealth.AutomatedTest
+{
+    [TestClass]
+    public class MercuryHealthAppTestsOld
+    {
+        private static string _homePageUrl;
+        private static HomePage _homePage;
+        private static string _browserType;
+        private static string _applitoolsApiKey;
+        private static string _applitoolsBatchName;
+        private static string _applitoolsBatchId;
+
+        public MercuryHealthAppTestsOld()
+        {
+
+        }
+
+        #region Setup and teardown
+        [ClassInitialize]
+
+        public static void Initialize(TestContext context)
+        {
+            try
+            {
+                _browserType = context.Properties["browserType"].ToString();
+                _homePageUrl = context.Properties["appUrl"].ToString();
+             }
+            catch (Exception)
+            {
+                _browserType = "chrome";
+                _homePageUrl = "https://mercuryhealth-dev.azurewebsites.net/";
+            }
+        }
+
+        [ClassCleanup]
+        public static void Cleanup()
+        {
+
+        }
+        #endregion
+
+        #region Tests
+        [TestMethod]
+        [TestCategory("UITests")]
+        public void BrowseToHomePageTest()
+        {
+            var webApp = HomePageOld.Launch("Browse To Home Page Test", _browserType);
+
+            try
+            {
+                webApp.BrowseToHomePage(_homePageUrl)
+                    .VerifyHomePageReached();
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Execption occured during test run: " + e);
+            }
+            finally
+            {
+                webApp.Close();
+            }
+
+        }
+
+        [TestMethod]
+        [TestCategory("UITests")]
+        public void BrowseToNutritionPageTest()
+        {
+            var webApp = HomePage.Launch("Browse To Nutrition Page Test", _browserType);
+
+            try
+            {
+                webApp.BrowseToHomePage(_homePageUrl)
+                    .VerifyHomePageReached()
+                    .TakeVisualPicture<HomePage>("Home Page")
+                    .ClickNutritionLink()
+                    .VerifyNutritionPageReached();
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Exception occured durring test run: " + e);
+            }
+            finally
+            {
+                webApp.Close();
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("UITests")]
+        public void BrowseToCreateFoodLogEntryTest()
+        {
+            var webApp = HomePage.Launch("Browse To Create Food Log Entry Test", _browserType);
+
+            try
+            {
+                webApp.BrowseToHomePage(_homePageUrl)
+                    .VerifyHomePageReached()
+                    .ClickNutritionLink()
+                    .VerifyNutritionPageReached()
+                    .ClickCreateNewLink()
+                    .VerifyCreatePageReached();
+
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Exception occured during test run: " + e);
+            }
+            finally
+            {
+                webApp.Close();
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("UITests")]
+        public void Add1stDonutTest()
+        {
+            var webApp = HomePageOld.Launch("Add 1st Donut Test", _browserType);
+
+            try
+            {
+                // browse to home page of app
+                webApp.BrowseToHomePage(_homePageUrl)
+                    .VerifyHomePageReached()
+
+                    //go to nutrition page
+                    .ClickNutritionLink()
+
+                    // clean up and delete all donuts, take a picture of cleaned up nutrition page
+                    .RemoveAllFood("Donut")
+
+                    // click create new link to add new food
+                    .ClickCreateNewLink()
+                    .VerifyCreatePageReached()
+
+                    // add donut as a food item and click the add button
+                    .SetDescription("Donut")
+                    .ClickCreateButton()
+                    .VerifyNutritionPageReached()
+                    .VerifyFoodInTable("Donut", 1)
+
+                    // clean up and delete all donuts 
+                    .RemoveAllFood("Donut");
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Exception occured during test run: " + e);
+            }
+            finally
+            {
+                webApp.Close();
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("UITests")]
+        public void DeleteDonutTest()
+        {
+            var webApp = HomePage.Launch("Delete Donut Test", _browserType);
+
+            try
+            {
+                // browse to home page of app
+                webApp.BrowseToHomePage(_homePageUrl)
+                    .VerifyHomePageReached()
+
+                    //go to nutrition page
+                    .ClickNutritionLink()
+
+                    // clean up and delete all donuts 
+                    .RemoveAllFood("Donut")
+
+                    // click create new link to add new food
+                    .ClickCreateNewLink()
+                    .VerifyCreatePageReached()
+
+                    // add donut as a food item and click the add button
+                    .SetDescription("Donut")
+                    .ClickCreateButton()
+                    .VerifyNutritionPageReached()
+                    .VerifyFoodInTable("Donut", 1)
+
+                    // delete the donut
+                    .ClickDeleteFood("Donut")
+                    .VerifyDeleteFoodPageReached()
+                    .ClickDeleteButton()
+                    .VerifyNutritionPageReached()
+                    .VerifyFoodNotInTable("Donut");
+
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Exception occured during test run: " + e);
+            }
+            finally
+            {
+                webApp.Close();
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("UITests")]
+        public void EditDonutTest()
+        {
+            var webApp = HomePage.Launch("Edit Donut Test", _browserType);
+
+            try
+            {
+                // browse to home page of app
+                webApp.BrowseToHomePage(_homePageUrl)
+                    .VerifyHomePageReached()
+
+                    //go to nutrition page
+                    .ClickNutritionLink()
+                    .VerifyNutritionPageReached()
+
+                    // clean up and delete all donuts 
+                    .RemoveAllFood("Donut")
+
+                    // click create new link to add new food
+                    .ClickCreateNewLink()
+                    .VerifyCreatePageReached()
+
+                    // add donut as a food item and click the add button
+                    .SetDescription("Donut")
+                    .ClickCreateButton()
+                    .VerifyNutritionPageReached()
+                    .VerifyFoodInTable("Donut", 1)
+
+                    // click on the edit for the donut
+                    .ClickEditFoodLink("Donut")
+                    .VerifyEditFoodPageReached()
+                    .SetCarbs("999.99")
+                    .ClickSaveButton()
+                    .VerifyNutritionPageReached()
+                    .VerifyCarbs("Donut", "999.99")
+
+                    // clean up and delete all donuts 
+                    .RemoveAllFood("Donut");
+
+
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Execption occured during test run: " + e);
+            }
+            finally
+            {
+                webApp.Close();
+            }
+
+        }
+
+        [TestMethod]
+        [TestCategory("UITests")]
+        public void BrowseToExercisePageTest()
+        {
+            var webApp = HomePage.Launch("Browse To Exercise Page Test", _browserType);
+
+            try
+            {
+                webApp.BrowseToHomePage(_homePageUrl)
+                .VerifyHomePageReached()
+                .ClickExercisesLink()
+                .VerifyExercisePageReached();
+
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Exception occured during test run: " + e);
+            }
+            finally
+            {
+                webApp.Close();
+            }
+
+
+        }
+
+        [TestMethod]
+        [TestCategory("UITests")]
+        public void BrowseToCreateExerciseEntryTest()
+        {
+            var webApp = HomePage.Launch("Browse To Create Exercise Entry Test", _browserType);
+
+            try
+            {
+                webApp.BrowseToHomePage(_homePageUrl)
+                    .VerifyHomePageReached()
+                     .ClickExercisesLink()
+                    .VerifyExercisePageReached()
+                    .ClickCreateNewLink()
+                    .VerifyCreatePageReached();
+
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Exception occured during test run : " + e);
+            }
+            finally
+            {
+                webApp.Close();
+            }
+        }
+
+
+        
+
+        #endregion
+    }
+}

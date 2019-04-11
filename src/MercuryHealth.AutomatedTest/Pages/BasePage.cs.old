@@ -1,0 +1,111 @@
+﻿using Applitools;
+using Applitools.Selenium;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.IE;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MercuryHealth.AutomatedTest.Pages
+{
+    public class BasePageOld
+    {
+        protected IWebDriver _driver;
+
+        private static string TESTNAME;
+        private static Size WINDOWSIZE = new Size(1366, 768);
+
+
+        protected BasePageOld()
+        {
+
+        }
+
+
+        #region Actions
+        public HomePageOld BrowseToHomePage(string homePageUrl)
+        {
+            // browse to the home page
+            _driver.Navigate().GoToUrl(homePageUrl);
+            return new HomePageOld(_driver);
+        }
+
+        public NutritionPage ClickNutritionLink()
+        {
+            try
+            {
+                var nutritionLink = _driver.FindElement(By.LinkText("Nutrition"));
+                nutritionLink.Click();
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Could not find nutrition link: " + e.Message);
+            }
+            return new NutritionPage(_driver);
+        }
+
+        public ExercisePage ClickExercisesLink()
+        {
+            try
+            {
+                var nutritionLink = _driver.FindElement(By.LinkText("Exercises"));
+                nutritionLink.Click();
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Could not find exercises link: " + e.Message);
+            }
+            return new ExercisePage(_driver);
+        }
+
+        public MyMetricsPage ClickMyMetricsLink()
+        {
+            try
+            {
+                var nutritionLink = _driver.FindElement(By.LinkText("My Metrics"));
+                nutritionLink.Click();
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Could not find my metrics link: " + e.Message);
+            }
+            return new MyMetricsPage(_driver);
+        }
+
+        #endregion
+
+
+        #region Launch and close selenium web driver
+        public static HomePageOld Launch(string testName, string browser = "ie")
+        {
+            // based on the browser passed in, created your web driver
+            IWebDriver driver;
+            if (browser.Equals("chrome"))
+            {
+                driver = new ChromeDriver();
+            }
+            else
+            {
+                driver = new InternetExplorerDriver();
+            }
+                                
+
+            // set the window size of the browser and browse to the home page
+            driver.Manage().Window.Size = WINDOWSIZE;
+            return new HomePageOld(driver);
+        }
+
+        public void Close()
+        {
+            _driver.Quit();
+            _driver.Dispose();
+        }
+        #endregion
+
+    }
+}
